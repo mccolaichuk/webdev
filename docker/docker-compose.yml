@@ -1,0 +1,26 @@
+version: '2'
+
+services:
+  slack_php:
+    container_name: slack_php
+    build:
+      context: ./php-fpm
+    environment:
+      XDEBUG_CONFIG: "remote_host=172.17.0.1"
+      PHP_IDE_CONFIG: "serverName=Docker"
+    volumes:
+      - ../:/var/www
+    user: ${DOCKER_USER}
+  slack_nginx:
+    container_name: slack_nginx
+    build:
+      context: ./nginx
+    volumes:
+      - ../:/var/www
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/sites/:/etc/nginx/sites-available
+      - ./nginx/conf.d/:/etc/nginx/conf.d
+    depends_on:
+      - slack_php
+    ports:
+      - "81:80"
